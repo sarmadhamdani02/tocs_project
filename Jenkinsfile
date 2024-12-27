@@ -1,28 +1,34 @@
 pipeline {
     agent any
+    
+    environment {
+        DEPLOY_SERVER = 'ubuntu@<apache-instance-public-ip>'  // Replace with the Apache server's public IP.
+        DEPLOY_DIR = '/var/www/html'  // This is where your Apache serves files from.
+    }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                // Git is automatically pulling from GitHub, so this step isn't needed.
+                // Checkout code from GitHub repository
+                checkout scm
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                // Here, if necessary, build your project. For a simple HTML file, you can skip this step.
+                echo "Build stage - Skipping build for simple HTML project"
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Deploy') {
             steps {
-                script {
-                    // Build the Docker image from the Dockerfile
-                    sh 'docker build -t my-html-site .'
-                }
-            }
-        }
-
-        stage('Run Docker Container') {
-            steps {
-                script {
-                    // Run the Docker container on port 8000
-                    sh 'docker run -d -p 8000:80 my-html-site'
-                }
+                // Deploy to Apache server on EC2
+                echo "Deploying to Apache server"
+                sh '''
+                    # Copy the HTML files to the Apache web directory
+                    scp -i /path/to/your/private-key.pem -r * ${DEPLOY_SERVER}:${DEPLOY_DIR}
+                '''
             }
         }
     }
