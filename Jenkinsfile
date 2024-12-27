@@ -16,7 +16,7 @@ pipeline {
                 script {
                     // Use the Jenkins credentials for the private key
                     withCredentials([file(credentialsId: 'apache-ssh-key', variable: 'PRIVATE_KEY_PATH')]) {
-                        // Copy the index.html to the Apache server
+                        // Now, we use the private key that Jenkins has securely handled
                         sh """
                         scp -i ${PRIVATE_KEY_PATH} -o StrictHostKeyChecking=no index.html ${DEPLOY_SERVER}:${REMOTE_DIR}/
                         """
